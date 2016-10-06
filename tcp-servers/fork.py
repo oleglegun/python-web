@@ -20,7 +20,7 @@ while True:
     if child_pid == 0:  # Means that child process was initiated and we now in child
         request = client_socket.recv(1024)
         client_socket.send(request.upper())
-        print '(child {}) {} : {}'.format(client_socket.getpeername(), request)
+        print '(child {}) {} : {}'.format(child_pid, client_socket.getpeername(), request)
         client_socket.close()  # Close child's FD for socket (for OS GC)
         sys.exit()  # kill child process
     else:  # Continues in parent process
