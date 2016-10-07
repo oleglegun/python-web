@@ -19,3 +19,8 @@ screen -S new_screen
 `screen -ls` - show all screens
 
 `screen -r` - return to last screen
+
+### Show forked processes in real time
+```
+watch "ps ax | grep fork"
+```
