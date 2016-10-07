@@ -4,6 +4,8 @@ import os
 import socket
 import sys
 
+# Prefork works like fork, but uses slightly less memory
+# We always have 4 or n child processes, instead of creating one for each inbound connection
 
 server_socket = socket.socket()
 server_socket.bind(('', 8080))
@@ -14,6 +16,8 @@ for i in range(4):
     if child_pid == 0:
         try:
             while True:
+                # each forked process tries to read from the same server socket (FD)
+                # OS gives connection to each process in queue
                 client_socket, remote_address = server_socket.accept()
                 request = client_socket.recv(1024)
                 client_socket.send(request.upper())
