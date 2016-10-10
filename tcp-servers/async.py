@@ -9,6 +9,7 @@ import select
 server_socket = socket.socket()
 server_socket.bind(('', 8080))
 server_socket.setblocking(0)  # Do not block (use non blocking IO operations) thus we need to use events
+# In blocking IO: process sleeps until the answer arrives from client
 server_socket.listen(10)
 
 # Create 3 lists
