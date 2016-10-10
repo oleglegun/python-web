@@ -2,7 +2,7 @@
 
 ### Usage
 Start web server
-```
+```bash
 python fork.py
 ```
 
