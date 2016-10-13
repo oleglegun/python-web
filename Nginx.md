@@ -79,7 +79,7 @@ Folder `conf.d/` contain all virtual hosts like `yandex.conf`,
 
 ```nginx
 upstream test {
-    server 127.0.0.1:8003;
+    server 127.0.0.1:8003;  # Application server works on port 8003
 }
 
 server {
@@ -88,14 +88,15 @@ server {
     client_max_body_size 32m;
 
     location / {
-        proxy_pass http://test;
+        proxy_pass http://test;  # redirect all requests to upstream and then send back reply from it
+        # We change HTTP headers Host and X-Real-IP
         proxy_set_header Host test.legun.pro;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_read_timeout 60s;
     }
 
     location /static/ {
-        alias /home/oleglegun/it-portal/it-portal/collected_static/;
+        alias /home/oleglegun/test/collected_static/;
     }
 
     location /media/ {
@@ -109,11 +110,11 @@ server {
 
     location /media/{ 
         access_log off;
-        alias /home/oleglegun/it-portal/webdav/;
+        alias /home/oleglegun/test/webdav/;
     }
 
     location /webdav/ {
-        alias /home/oleglegun/it-portal/webdav/;
+        alias /home/oleglegun/test/webdav/;
         dav_methods PUT DELETE MKCOL COPY MOVE;
         create_full_put_path on;
         dav_access group:rw all:rw;
@@ -122,9 +123,10 @@ server {
 }
 ```
 
-**Nginx** serves static content like images, css...
-**Nginx** proxies other requests to the **Application Server**.
+**Nginx** serves static content like images, css... **Nginx** proxies
+other requests to the **Application Server** like **Django**. **Nginx**
+can implement load balancing between Application Servers in `upstream`
+section.
 
-
-
-
+All requests that don't go to locations `/media/` or `/static/` go to
+`/`.
