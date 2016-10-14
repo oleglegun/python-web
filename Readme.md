@@ -80,7 +80,7 @@ watch "ps ax | grep fork"
 *  mod_perl, mod_python, mod_php..
 *  PSGI, WSGI, Rack
 
-### WSGI Communication Protocol (gunicorn - Django)
+### WSGI Communication Agreement (gunicorn - Django)
 
 ```python
 def simple_wsgi_app(environ, start_responce):
@@ -90,6 +90,12 @@ def simple_wsgi_app(environ, start_responce):
 
 **gunicorn** is App Server (written on Python) for Django that processes
 requests from Nginx (faster than Django's own server) and calls Django's
-callback functions.
+callback functions. **gunicorn** parses headers, body, url of the
+request, imports python function for processing requests (logic layer),
+calls that function for that request, sends return value from it to
+Nginx.
+
+[Start gunicorn](http://gunicorn.org/#quickstart): `gunicorn -b
+0.0.0.0:8080 project.wsgi:application`
 
 
