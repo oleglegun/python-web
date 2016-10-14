@@ -130,3 +130,9 @@ section.
 
 All requests that don't go to locations `/media/` or `/static/` go to
 `/`.
+
+| Command                               | Action             |
+|:--------------------------------------|:-------------------|
+| `sudo nginx`                          | Start server       |
+| `sudo nginx -s stop`                  | Stop server        |
+| `vim /usr/local/etc/nginx/nginx.conf` | Edit configuration |
