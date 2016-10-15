@@ -21,6 +21,16 @@
 2. Worker (www-data, 1+ processes)
     * Process incoming connections
 
+### Nginx modules
+
+| Name             | Description                                                       |
+|:-----------------|:------------------------------------------------------------------|
+| `mod_mime`       | Determine MIME type from file .extension                          |
+| `mod_mime_magic` | Determine MIME type from file signature (first n bytes)           |
+| `mod_autoindex`  | Generates files list if request was not to file, but to `folder/` |
+| `mod_rewrite`    | Changes URL while processing request                              |
+| `mod_gzip`       |                                                                   |
+
 #### Config File
 
 
@@ -49,7 +59,7 @@ http {
     # server_name_in_redirect off;
     
     include /etc/nginx/mime.types;
-    default_type application/octet-stream;
+    default_type application/octet-stream;  # Default MIME type
     
     # Logging Settings
     
@@ -82,12 +92,13 @@ upstream test {
     server 127.0.0.1:8003;  # Application server works on port 8003
 }
 
+# Virtual host#1 settings
 server {
-    server_name test.legun.pro;  # must be the same in the HTTP domain
+    server_name test.legun.pro www.test.legun.pro;  # must be the same in the HTTP domain
     listen 80;
     client_max_body_size 32m;
 
-    location / {
+    location / {  # any URI
         proxy_pass http://test;  # redirect all requests to upstream and then send back reply from it
         # We change HTTP headers Host and X-Real-IP
         proxy_set_header Host test.legun.pro;
@@ -103,8 +114,15 @@ server {
         proxy_set_header Host webdav.test.legun.pro;
         proxy_pass http://webdav.test.legun.pro;
     }
+    
+    location ~* ^.+\.(jpg|jpeg|gif)$ {  # ~* RegExp
+        root       /www/images;
+        access_log off;
+        expires    30d;
+    }
 }
 
+# Virtual host#2 settings
 server {
     server_name webdav.test.legun.pro;
 
@@ -122,6 +140,15 @@ server {
 
 }
 ```
+
+location
+
+| nginx `location` directive | Priority | Meaning                       |
+|:---------------------------|:--------:|:------------------------------|
+| `location = /img/1.jpg`    |   ^^^^   | `=` Exact match               |
+| `location /img/`           |    ^     | URI prefix match              |
+| `location ~* \.jpg$`       |    ^^    | `~*` RegExp match             |
+| `location ^~ /pic/`        |   ^^^    | `!important` for prefix match |
 
 **Nginx** serves static content like images, css... **Nginx** proxies
 other requests to the **Application Server** like **Django**. **Nginx**
