@@ -21,7 +21,7 @@
 2. Worker (www-data, 1+ processes)
     * Process incoming connections
 
-### Nginx modules
+### Server modules
 
 | Name             | Description                                                       |
 |:-----------------|:------------------------------------------------------------------|
@@ -29,9 +29,9 @@
 | `mod_mime_magic` | Determine MIME type from file signature (first n bytes)           |
 | `mod_autoindex`  | Generates files list if request was not to file, but to `folder/` |
 | `mod_rewrite`    | Changes URL while processing request                              |
-| `mod_gzip`       |                                                                   |
+| `mod_gzip`       | Compresses files                                                  |
 
-#### Config File
+### Config File
 
 
 ```nginx
@@ -85,7 +85,7 @@ change their owner to `www-data` or add read right to all users.
 Folder `conf.d/` contain all virtual hosts like `yandex.conf`,
 `legunpro.conf`...
 
-#### Example of .conf file
+### Example of .conf file
 
 ```nginx
 upstream test {
@@ -116,7 +116,7 @@ server {
     }
     
     location ~* ^.+\.(jpg|jpeg|gif)$ {  # ~* RegExp
-        root       /www/images;
+        root       /www/images;  # Seach URLs here
         access_log off;
         expires    30d;
     }
@@ -141,14 +141,29 @@ server {
 }
 ```
 
-location
+### Serving static files w/ `location`
 
-| nginx `location` directive | Priority | Meaning                       |
-|:---------------------------|:--------:|:------------------------------|
-| `location = /img/1.jpg`    |   ^^^^   | `=` Exact match               |
-| `location /img/`           |    ^     | URI prefix match              |
-| `location ~* \.jpg$`       |    ^^    | `~*` RegExp match             |
-| `location ^~ /pic/`        |   ^^^    | `!important` for prefix match |
+| nginx `location` directive | Priority | Meaning                       | Match example |
+|:---------------------------|:--------:|:------------------------------|:--------------|
+| `location = /img/1.jpg`    |   ^^^^   | `=` Exact match               | `/img/1.jpg`  |
+| `location /img/`           |    ^     | URI prefix match              | `/img/2.gif`  |
+| `location ~* \.jpg$`       |    ^^    | `~*` RegExp match             | `/img/2.jpg`  |
+| `location ^~ /pic/`        |   ^^^    | `!important` for prefix match | `/pic/1.jpg`  |
+
+
+```nginx
+location ~* ^.+\.(jpg|jpeg|gif)$ {
+    root /www/images;  # Appends to URL
+}
+location /sitemap/ {
+    alias /home/www/generated;  # Replaces URL, alias works only w/ prefix
+}
+```
+
+`/2016/10/asdf34.jpg` -> `/www/images/2015/10/asdf34.jpg`  
+`/sitemap/index.xml` -> `/home/www/generated/index.xml`
+
+---
 
 **Nginx** serves static content like images, css... **Nginx** proxies
 other requests to the **Application Server** like **Django**. **Nginx**
